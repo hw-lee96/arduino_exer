@@ -17,132 +17,126 @@ int soilHumidity;
 
 // 타이머 변수
 
-int h = 21;    // 시
-int m = 40;    // 분
-int s = 00;    // 초
-unsigned long ss;  // 밀리세컨드
+int h;    // 시
+int m;    // 분
+int s;    // 초
+
+int hh;   // 타이머 시
+int mm;   // 타이머 분
+unsigned long ss;  // 타이머 초
 
 /*디지털핀 초기화하기*/
 void initPin() {
-	pinMode(O_PUMP_A, OUTPUT);
-	pinMode(O_PUMP_B, OUTPUT);
-	pinMode(O_RGB_R, OUTPUT);
-	pinMode(O_RGB_G, OUTPUT);
-	pinMode(O_RGB_B, OUTPUT);
+  pinMode(O_PUMP_A, OUTPUT);
+  pinMode(O_PUMP_B, OUTPUT);
+  pinMode(O_RGB_R, OUTPUT);
+  pinMode(O_RGB_G, OUTPUT);
+  pinMode(O_RGB_B, OUTPUT);
 
-	digitalWrite(O_RGB_R, LOW);
-	digitalWrite(O_RGB_G, LOW);
-	digitalWrite(O_RGB_B, LOW);
-	analogWrite(O_PUMP_A, 0);
-	analogWrite(O_PUMP_B, 0);
+  digitalWrite(O_RGB_R, LOW);
+  digitalWrite(O_RGB_G, LOW);
+  digitalWrite(O_RGB_B, LOW);
+  analogWrite(O_PUMP_A, 0);
+  analogWrite(O_PUMP_B, 0);
 }
 
 /*LCD INTRO출력하기*/
 void introLcd() {
-	lcd.print("Planting Kit");
-	lcd.setCursor(0, 1);
-	lcd.print("Rev1.0");
+  lcd.print("Planting Kit");
+  lcd.setCursor(0, 1);
+  lcd.print("Rev1.0");
 }
 
 /*LCD 습도 프린트하기*/
 void printLcd() {
   ss = round(millis()*0.001);
-  if ( ss >= 60 ) {
-    s = 0;
-    m++;
-  } else {
-    s = ss;
-  }
-  if ( m >= 60 ) {
-    m = 0;
-    h++;
-  }
-  if ( h >= 24 ) {
-    h = 0;
-  }
-  
-	lcd.init();
-	lcd.clear();
-//	lcd.backlight();
-	lcd.setCursor(0, 0);
-	lcd.print("Moisture : ");
-	lcd.print(soilHumidity);
-	lcd.print("%");
-	lcd.setCursor(0, 1);
+  s = ss % 60;
+  mm = (ss / 60)%60;
+  hh = (ss / 3600)%24;
 
-  if ( h < 10 ) lcd.print(0);
-  lcd.print(h);
+  int vm = (m + mm)%60;
+  int vh = (h + hh)%24;
+
+  lcd.init();
+  lcd.clear();
+//  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("Moisture : ");
+  lcd.print(soilHumidity);
+  lcd.print("%");
+  lcd.setCursor(0, 1);
+
+  if ( vh < 10 ) lcd.print(0);
+  lcd.print(vh);
   lcd.print(":");
-  if ( m < 10 ) lcd.print(0);
-  lcd.print(m);
+  if ( vm < 10 ) lcd.print(0);
+  lcd.print(vm);
   lcd.print(":");
   if ( s < 10 ) lcd.print(0);
   lcd.print(s);
-//  lcd.print(", ");
-//  lcd.print(ss);
   
   delay(1000);
   
-//	if (soilHumidity < 20)
-//		lcd.print("Water Pump Start");
-//	else if (soilHumidity < 40)
-//		lcd.print("Soil is Dry");
-//	else if (soilHumidity < 70)
-//		lcd.print("Soil is Normal");
-//	else if (soilHumidity < 90)
-//		lcd.print("Soil is Wet");
-//	else
-//		lcd.print("In the Water");
+//  if (soilHumidity < 20)
+//    lcd.print("Water Pump Start");
+//  else if (soilHumidity < 40)
+//    lcd.print("Soil is Dry");
+//  else if (soilHumidity < 70)
+//    lcd.print("Soil is Normal");
+//  else if (soilHumidity < 90)
+//    lcd.print("Soil is Wet");
+//  else
+//    lcd.print("In the Water");
 
 
 }
 
 /*LCD 초기화하기*/
 void initLcd() {
-	lcd.init();
-	lcd.backlight();
-	lcd.setCursor(0, 0);
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
 
-	// INTRO LCD 출력
-	introLcd();
+  // INTRO LCD 출력
+  introLcd();
 }
 
 /*토양습도 계산하기*/
 void calcSoilHumidity() {
-	soilHumidity = map(analogRead(A_SOIL_HUMI), 1000, 400, 0, 100);
-	// if(soilHumidity > 100) soilHumidity = 100;
-	// else if(soilHumidity < 0) soilHumidity = 0;
+  soilHumidity = map(analogRead(A_SOIL_HUMI), 1000, 400, 0, 100);
+  // if(soilHumidity > 100) soilHumidity = 100;
+  // else if(soilHumidity < 0) soilHumidity = 0;
 }
 
 void writeRGB(bool R, bool G, bool B) {
-	digitalWrite(O_RGB_R, R);
-	digitalWrite(O_RGB_G, G);
-	digitalWrite(O_RGB_B, B);
+  digitalWrite(O_RGB_R, R);
+  digitalWrite(O_RGB_G, G);
+  digitalWrite(O_RGB_B, B);
 }
 
 // 펌프 작동
 void pumpOn(int mois) {
-	// 습도가 변수(mois) 미만일 때 펌프 작동
-	if ( soilHumidity < mois ) {
-		delay(2000);
-		lcd.clear();
-		lcd.noBacklight();
-		
-		// 230*5 = 1.150초
-		for ( int i = 0; i < 230; i++ ) {
-			analogWrite(O_PUMP_A, i);
-			delay(5);
-		}
+  // 습도가 변수(mois) 미만일 때 펌프 작동
+  if ( soilHumidity < mois ) {
+    delay(2000);
+    lcd.clear();
+    lcd.noBacklight();
+    
+    // 230*5 = 1.150초
+    for ( int i = 0; i < 230; i++ ) {
+      analogWrite(O_PUMP_A, i);
+      delay(5);
+    }
 
-		delay(mois == 80 ? On_Time*4:On_Time);		// 0.5초
-		analogWrite(O_PUMP_A, 0);
-		analogWrite(O_PUMP_B, 0);
-		delay(100);
-	} else {
-		analogWrite(O_PUMP_A, 0);
-		analogWrite(O_PUMP_B, 0);
-		delay(1000);
-	}
+    delay(mois == 80 ? On_Time*4:On_Time);    // 0.5초
+    analogWrite(O_PUMP_A, 0);
+    analogWrite(O_PUMP_B, 0);
+    delay(100);
+  } else {
+    analogWrite(O_PUMP_A, 0);
+    analogWrite(O_PUMP_B, 0);
+    delay(1000);
+  }
 }
 
 // LED 작동
@@ -165,8 +159,8 @@ void LEDOn() {
 
 // 전원 들어왔을 때 한 번 실행
 void setup() {
-	// 핀 초기화
-	initPin();
+  // 핀 초기화
+  initPin();
 
   // 토양 습도 계산
   calcSoilHumidity();
@@ -174,22 +168,26 @@ void setup() {
   // 펌프 작동
   pumpOn(80);
   
-	// LCD 초기화
-	initLcd();
+  // LCD 초기화
+  initLcd();
+  
+  h = 22;    // 시
+  m = 57;    // 분
+  s = 0;    // 초
 }
 
 
   
 void loop() {
-	// 토양 습도 계산
-	calcSoilHumidity();
+  // 토양 습도 계산
+  calcSoilHumidity();
 
-	// 습도 프린트
-	printLcd();
+  // 습도 프린트
+  printLcd();
 
   // LED 작동
   LEDOn();
 
-	// 펌프 작동
-	pumpOn(60);
+  // 펌프 작동
+  pumpOn(60);
 }

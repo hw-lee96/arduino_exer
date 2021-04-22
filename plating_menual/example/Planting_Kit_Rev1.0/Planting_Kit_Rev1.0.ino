@@ -55,7 +55,7 @@ void printLcd() {
   hh = (ss / 3600)%24;
 
   int vm = (m + mm)%60;
-  int vh = (h + hh)%24;
+  int vh = (h + hh + (m+mm)/60 )%24;
 
   lcd.init();
   lcd.clear();
@@ -171,8 +171,8 @@ void setup() {
   // LCD 초기화
   initLcd();
   
-  h = 22;    // 시
-  m = 57;    // 분
+  h = 23;    // 시
+  m = 9;    // 분
   s = 0;    // 초
 }
 

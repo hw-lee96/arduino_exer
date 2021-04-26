@@ -25,6 +25,9 @@ int hh;   // 타이머 시
 int mm;   // 타이머 분
 unsigned long ss;  // 타이머 초
 
+int vm;   // 화면 노출용 분
+int vh;   // 화면 노출용 시
+
 /*디지털핀 초기화하기*/
 void initPin() {
   pinMode(O_PUMP_A, OUTPUT);
@@ -54,8 +57,8 @@ void printLcd() {
   mm = (ss / 60)%60;
   hh = (ss / 3600)%24;
 
-  int vm = (m + mm)%60;
-  int vh = (h + hh + (m+mm)/60 )%24;
+  vm = (m + mm)%60;
+  vh = (h + hh + (m+mm)/60)%24;
 
   lcd.init();
   lcd.clear();
@@ -142,16 +145,19 @@ void pumpOn(int mois) {
 // LED 작동
 void LEDOn() {
   lcd.noBacklight();
-  if ( 6 <= h && h < 12 ) { // 처음 가동 후 8시간 뒤 LED 작동하게 함
+  if ( 7 <= vh && vh < 11 ) {  
     lcd.backlight();
     writeRGB(HIGH, LOW, HIGH);
-  } else if ( 12 <= h && h < 16 ) {  // LED 작동 4시간 뒤 LED 끔
-    lcd.noBacklight();
+  } else if ( 11 <= vh && vh < 15 ) {
+    lcd.backlight();
     writeRGB(LOW, LOW, LOW);
-  } else if ( 16 <= h && h < 20 ) {  // 다시 4시간 뒤 LED 켬
+  } else if ( 15 <= vh && vh < 19 ) {
     lcd.backlight();
     writeRGB(HIGH, LOW, HIGH);
-  } else {
+  } else if ( 19 <= vh && vh < 22 ) {
+    lcd.backlight();
+    writeRGB(LOW, LOW, LOW);
+  } else{
     lcd.noBacklight();
     writeRGB(LOW, LOW, LOW);
   }
@@ -171,8 +177,8 @@ void setup() {
   // LCD 초기화
   initLcd();
   
-  h = 23;    // 시
-  m = 9;    // 분
+  h = 21;    // 시
+  m = 26;    // 분
   s = 0;    // 초
 }
 

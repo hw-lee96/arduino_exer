@@ -172,13 +172,13 @@ void setup() {
   calcSoilHumidity();
 
   // 펌프 작동
-  pumpOn(80);
+  // pumpOn(80);
   
   // LCD 초기화
   initLcd();
   
-  h = 21;    // 시
-  m = 26;    // 분
+  h = 20;    // 시
+  m = 3;    // 분
   s = 0;    // 초
 }
 
@@ -195,5 +195,5 @@ void loop() {
   LEDOn();
 
   // 펌프 작동
-  pumpOn(60);
+  // pumpOn(60);
 }

@@ -28,6 +28,8 @@ unsigned long ss;  // 타이머 초
 int vm;   // 화면 노출용 분
 int vh;   // 화면 노출용 시
 
+int lightType = 3 ;   // 불빛 타입
+
 /*디지털핀 초기화하기*/
 void initPin() {
   pinMode(O_PUMP_A, OUTPUT);
@@ -62,7 +64,6 @@ void printLcd() {
 
   lcd.init();
   lcd.clear();
-//  lcd.backlight();
   lcd.setCursor(0, 0);
   lcd.print("Moisture : ");
   lcd.print(soilHumidity);
@@ -77,21 +78,11 @@ void printLcd() {
   lcd.print(":");
   if ( s < 10 ) lcd.print(0);
   lcd.print(s);
+
+  lcd.print(" |Type:");
+  lcd.print(lightType);
   
   delay(1000);
-  
-//  if (soilHumidity < 20)
-//    lcd.print("Water Pump Start");
-//  else if (soilHumidity < 40)
-//    lcd.print("Soil is Dry");
-//  else if (soilHumidity < 70)
-//    lcd.print("Soil is Normal");
-//  else if (soilHumidity < 90)
-//    lcd.print("Soil is Wet");
-//  else
-//    lcd.print("In the Water");
-
-
 }
 
 /*LCD 초기화하기*/
@@ -144,23 +135,16 @@ void pumpOn(int mois) {
 
 // LED 작동
 void LEDOn() {
-  lcd.noBacklight();
-  if ( 7 <= vh && vh < 11 ) {  
-    lcd.backlight();
-    writeRGB(HIGH, LOW, HIGH);
-  } else if ( 11 <= vh && vh < 15 ) {
-    lcd.backlight();
-    writeRGB(LOW, LOW, LOW);
-  } else if ( 15 <= vh && vh < 19 ) {
-    lcd.backlight();
-    writeRGB(HIGH, LOW, HIGH);
-  } else if ( 19 <= vh && vh < 22 ) {
-    lcd.backlight();
-    writeRGB(LOW, LOW, LOW);
-  } else{
-    lcd.noBacklight();
-    writeRGB(LOW, LOW, LOW);
+  if ( 7 <= vh && vh <= 18 ) {
+    lightType = 1;
+  } else if ( 19 <= vh && vh <= 22 ) {
+    lightType = 2;
+  } else {
+    lightType = 3;
   }
+
+  writeRGB(lightType == 1 ? HIGH : LOW, LOW, lightType == 1 ? HIGH : LOW);
+  lightType != 3 ? lcd.backlight() : lcd.noBacklight();
 }
 
 // 전원 들어왔을 때 한 번 실행
@@ -177,8 +161,8 @@ void setup() {
   // LCD 초기화
   initLcd();
   
-  h = 20;    // 시
-  m = 3;    // 분
+  h = 11;    // 시
+  m = 33;    // 분
   s = 0;    // 초
 }
 
